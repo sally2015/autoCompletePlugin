@@ -19,15 +19,9 @@ module.exports = {
     ]
   },
   babel: {
-    presets: ['es2015']
+    presets: ['env']
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.optimize.DedupePlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': '"producttion"'

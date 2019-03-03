@@ -1,1 +1,0 @@
-{"version":3,"sources":["webpack:///./src/background.js?640f"],"names":[],"mappings":";;;;;;;AACA;;AACA;;AAEA,gBAAK,UAAL,E","file":"0.17bf97da3f1b4e01d727.hot-update.js","sourcesContent":["\nimport { count } from './biz/count/background';\nimport { info } from './common/log';\n\ninfo('12dWfdff');\n\n\n\n// WEBPACK FOOTER //\n// ./src/background.js"],"sourceRoot":""}

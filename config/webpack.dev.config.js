@@ -1,11 +1,10 @@
 var path = require('path');
 var webpack = require('webpack');
-
+const background = path.resolve(__dirname, '../src/background.js');
 module.exports = {
+    mode: 'development',
   entry: {
-    background: [
-      path.resolve(__dirname, '../src/background.js')
-    ]
+    background: [background],
   },
   output: {
     path: path.resolve(__dirname, '../build'),
@@ -13,9 +12,18 @@ module.exports = {
     sourceMapFilename: './sourcemap/[file].map'
   },
   module: {
-    loaders: [
+    rules: [
       { test: /\.vue$/, loader: 'vue' },
-      { test: /\.js$/, loader: 'babel', exclude: /node_modules/ },
+        { 
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [{
+                loader: 'babel',
+                options: {
+                    presets: ['env']
+                }
+            }]
+        },
       { test: /\.less$/, loader: 'style!css!less!sourceMap' }
     ]
   },
@@ -24,19 +32,16 @@ module.exports = {
       'vue$': 'vue/dist/vue.js'
     }
   },
-  babel: {
-    presets: ['es2015']
+  optimization: {
+    minimize: false
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.optimize.DedupePlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': '"development"'
       }
     })
   ],
-  color: true,
-  devtool: '#source-map',
-  watch: true
+  devtool: '#source-map'
 };
