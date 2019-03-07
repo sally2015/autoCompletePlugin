@@ -1,24 +1,32 @@
 
 <template>
-  <div class="demo-count" v-show="isShow">
+  <div class="demo-count">
     <div v-text="count"></div>
-    <button @click="add">addfssffff</button>
+    <button @click="change" id="ignoreButton">录制</button>
   </div>
 </template>
 
 <script>
   import { MSG_COUNT_SHOW, MSG_COUNT_INCREMENT } from './msg';
   import { sendMessage } from '../../common/message';
-
+  import initRecord from '../../common/source'
+  import storage from '../../common/storage'
   export default {
     data() {
       return {
-        isShow: false,
-        count: 0
+        count: 0,
+        isRecord: false,
+        actionPaths: []
       };
     },
     methods: {
-      add() {
+      change() {
+        const url = location.href;
+        this.isRecord = !this.isRecord;
+        if(!this.isRecord) {
+          storage.set('test', this.actionPaths);
+          this.actionPaths = []
+        }
         sendMessage(MSG_COUNT_INCREMENT, (responseMsg) => {
           this.count = responseMsg.count;
           if (this.count >= 10) {
@@ -27,7 +35,15 @@
         });
       }
     },
-    mounted() {
+    async mounted() {
+      let data = await storage.get('test');
+      console.log('mounted', data)
+      initRecord((content) => {
+        if(this.isRecord && content.id !== 'ignoreButton') {
+          this.actionPaths.push(content);
+        }
+        console.log(this.actionPaths);
+      })
       sendMessage(MSG_COUNT_SHOW, (responseMsg) => {
         this.isShow = responseMsg.isShow;
       });

@@ -16,6 +16,7 @@ function entries(cb) {
     const allBiz = fs.readdirSync(bizDir);
     let entrys = {};
     let entryName = [];
+    
     allBiz.forEach((b) => {
       let bp = path.resolve(bizDir, b);
       if (fs.statSync(bp).isDirectory()) {
@@ -32,6 +33,7 @@ function entries(cb) {
     entrys['background'] = webpackDevConfig.entry.background;
     webpackDevConfig.entry = entrys;
     webpackBuildConfig.entry = entrys;
+    console.log(entrys, '22222')
     cb();
 }
 module.exports = entries

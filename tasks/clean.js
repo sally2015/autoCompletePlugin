@@ -9,7 +9,7 @@ function clean() {
     return;
   }
   isClean = true;
-  return gulp.src(buildPath, {read: false})
+  return gulp.src(buildPath, {read: false, allowEmpty: true})
              .pipe(gulClean({
                  force: true
              }));

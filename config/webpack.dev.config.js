@@ -2,7 +2,8 @@ var path = require('path');
 var webpack = require('webpack');
 const background = path.resolve(__dirname, '../src/background.js');
 module.exports = {
-    mode: 'development',
+  context: path.resolve(__dirname, '..'),
+  mode: 'development',
   entry: {
     background: [background],
   },
@@ -11,16 +12,20 @@ module.exports = {
     filename: '[name].js',
     sourceMapFilename: './sourcemap/[file].map'
   },
+  resolve: {
+    extensions: ['.js', '.vue']
+  },
   module: {
     rules: [
-      { test: /\.vue$/, loader: 'vue' },
+      { test: /\.vue$/, loader: 'vue-loader' },
         { 
             test: /\.js$/,
             exclude: /node_modules/,
             use: [{
-                loader: 'babel',
+                loader: 'babel-loader',
                 options: {
-                    presets: ['env']
+                    presets: ['es2015', 'stage-2'],
+                    plugins: ['transform-runtime', 'transform-decorators-legacy']
                 }
             }]
         },

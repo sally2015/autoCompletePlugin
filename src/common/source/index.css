@@ -1,0 +1,73 @@
+.__dolphin-dashboard {
+    z-index: 99999;
+    width: 300px;
+    height: 150px;
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    margin-left: -150px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background: rgba(0, 0, 0, .8);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    transition: all ease-in-out .6s;
+}
+
+.__dolphin-dashboard.hide {
+    bottom: -120px;
+}
+
+.__dolphin-dashboard header{
+    cursor: pointer;
+    color: white;
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid white;
+    font-size: 12px;
+}
+
+main .opts ul{
+    display: flex;
+    width: 100%;
+    /* height: 60px; */
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.opts ul li{
+    height: 40px;
+    line-height: 40px;
+}
+
+.opts ul li input[type=tel] {
+    width: 30px;
+    background-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    border: none;
+    border-bottom: 2px solid #fefefe;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
+main .btn {
+    margin: 10px;
+}
+
+.btn button {
+    background-color: #00cc66;
+    color: white;
+    outline: none;
+    width: 80%;
+    font-size: 14px;
+    height: 40px;
+    height: 40px;
+    border: none;
+}

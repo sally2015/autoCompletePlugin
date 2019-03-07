@@ -19,4 +19,4 @@ function move(cb) {
     cb();
 }
 
-module.exports = gulp.series(clean, move)
+module.exports = move

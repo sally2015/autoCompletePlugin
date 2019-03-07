@@ -5,7 +5,8 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "background.js"
+      "background.js",
+      "./reload.js"
     ]
   },
   "permissions": [
@@ -17,7 +18,9 @@
       "matches": [
         "*://localhost/*"
       ],
-      "js": ["count.js"],
+      "js": [
+        "count.js"
+      ],
       "run_at": "document_end"
     }
   ]

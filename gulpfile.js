@@ -29,7 +29,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('createEntry', function() {
-  var bizDir = path.resolve(__dirname, './src/biz/');
+  var bizDir = path.resolve(__dirname, './src/scripts/');
   var allBiz = fs.readdirSync(bizDir);
   var entrys = {};
   var entryName = [];
