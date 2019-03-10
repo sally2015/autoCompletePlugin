@@ -15,7 +15,7 @@
       </Row>
       <Row>
             <Col span="8" push="2">
-                <Button type="primary">执行</Button>
+                <Button type="primary" @click="run">执行</Button>
             </Col>
             <Col span="8" push="6">
                 <Button @click="del">删除</Button>
@@ -48,7 +48,8 @@
         selectedArr: [],
         isRecord: false,
         isShowModal: false,
-        stroageName: ''
+        stroageName: '',
+        executor: null
       };
     },
     methods: {
@@ -84,14 +85,21 @@
         del() {
             storage.remove(this.selectedArr);
             this.selectedArr = [];
+            this.query();
+        },
+        run() {
+            let paths = [];
+            this.selectedArr.forEach(selected => {
+                paths = paths.concat(storage.get(selected));
+            })
+            this.executor.run(paths);
         }
     },
     mounted() {
         this.query();
-    //   let executor = new Play();
-    //   executor.run(data);
+        this.executor = new Play();
         initRecord((content) => {
-            if(this.isRecord && content.id !== 'ignoreButton') {
+            if(this.isRecord && (content.selector.indexOf('ignoreButton') === -1)) {
                 this.actionPaths.push(content);
             }
         })
