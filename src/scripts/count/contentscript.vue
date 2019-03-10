@@ -1,8 +1,35 @@
 
 <template>
-  <div class="demo-count">
-    <div v-text="count"></div>
-    <button @click="change" id="ignoreButton">录制</button>
+  <div class="extension_layout">
+        <Row>
+            <Col span="8" push="8">
+                <Button icon="ios-add" :type="isRecord ? 'error': 'primary'" @click="change" id="ignoreButton">{{isRecord ? '录制中' : '录制'}}</Button>
+            </Col>
+      </Row>
+      <Row>
+          <Col span="24">
+            <Select v-model="selectedArr" style="width:100%" multiple>
+                <Option v-for="(item, index) in keys" :value="item" :key="index">{{item}}</Option>
+            </Select>       
+          </Col>
+      </Row>
+      <Row>
+            <Col span="8" push="2">
+                <Button type="primary">执行</Button>
+            </Col>
+            <Col span="8" push="6">
+                <Button @click="del">删除</Button>
+            </Col>
+      </Row>
+      <Modal
+        :value="isShowModal"
+        title="请填写此次录制id">
+        <Input v-model="stroageName" placeholder="请填写此次录制id" style="width: 300px" />
+        <div slot="footer">
+            <Button type="primary" @click="ok">确认</Button>
+            <Button @click="cancel">取消</Button>
+        </div>
+    </Modal>
   </div>
 </template>
 
@@ -11,58 +38,75 @@
   import { sendMessage } from '../../common/message';
   import initRecord from '../../common/source'
   import storage from '../../common/storage'
+  import Play from '../../common/play'
   export default {
     data() {
       return {
-        count: 0,
+        actionPaths: [],
+        list: [],
+        keys: [],
+        selectedArr: [],
         isRecord: false,
-        actionPaths: []
+        isShowModal: false,
+        stroageName: ''
       };
     },
     methods: {
-      change() {
-        const url = location.href;
-        this.isRecord = !this.isRecord;
-        if(!this.isRecord) {
-          storage.set('test', this.actionPaths);
-          this.actionPaths = []
+        query() {
+            let data = storage.get();
+            this.list = data;
+            this.keys = Object.keys(this.list);
+        },
+        change() {
+            const url = location.href;
+            this.isRecord = !this.isRecord;
+            if(!this.isRecord) {
+                this.isShowModal = true;
+            }
+        },
+        ok() {
+            if (!this.stroageName) {
+                this.isShowModal = true;
+                return this.$Message.error('请填写录制id');
+            }
+            storage.set(this.stroageName, this.actionPaths)
+            this.query();
+            this.reset();
+        },
+        cancel() {
+            this.reset();
+        },
+        reset() {
+            this.actionPaths = [];
+            this.storageName = '';  
+            this.isShowModal = false;
+        },
+        del() {
+            storage.remove(this.selectedArr);
+            this.selectedArr = [];
         }
-        sendMessage(MSG_COUNT_INCREMENT, (responseMsg) => {
-          this.count = responseMsg.count;
-          if (this.count >= 10) {
-            this.isShow = false;
-          }
-        });
-      }
     },
-    async mounted() {
-      let data = await storage.get('test');
-      console.log('mounted', data)
-      initRecord((content) => {
-        if(this.isRecord && content.id !== 'ignoreButton') {
-          this.actionPaths.push(content);
-        }
-        console.log(this.actionPaths);
-      })
-      sendMessage(MSG_COUNT_SHOW, (responseMsg) => {
-        this.isShow = responseMsg.isShow;
-      });
+    mounted() {
+        this.query();
+    //   let executor = new Play();
+    //   executor.run(data);
+        initRecord((content) => {
+            if(this.isRecord && content.id !== 'ignoreButton') {
+                this.actionPaths.push(content);
+            }
+        })
     }
   };
 </script>
-
-<style lang="less">
-.demo-count {
-  position: absolute;
-  background: #fff;
-  width: 200px;
-  height: 200px;
-  left: 50%;
-  top: 50%;
-  margin: -100px 0 0 -100px;
-  border: 1px solid red;
-  box-shadow: 0 2px 5px #999;
-  font-size: 24px;
-  text-align: center;
-}
+<style lang="less" scoped>
+.extension_layout {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: #fff;
+    width: 200px;
+    padding: 20px;
+    z-index: 10000;
+  }
 </style>

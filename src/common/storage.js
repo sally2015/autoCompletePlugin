@@ -5,47 +5,46 @@ class Storage {
         this.url = url;
     }
     @decoErrFn
-    async set(name, obj) {
-        let data = await this.get();
-        if (!data) {
-            data = {};
-        }
-        return new Promise((resove) => {
-            chrome.storage.sync.set({
-                [this.url]: Object.assign(data, {
-                    [name]: obj
-                })
-            }, () => {
-                if (chrome.runtime.lastError) {
-                    reject()
-                } else {
-                    resove();
-                }
+    set(name, obj) {
+        let data = this.get() || {};
+        if (name) {
+            data = Object.assign(data, {
+                [name]: obj
             })
-        })
+        } else {
+            data = obj;
+        }
+        localStorage.setItem(this.url,
+            JSON.stringify(data))
     }
     @decoErrFn
     get(name) {
-        return new Promise((resove) => {
-            chrome.storage.sync.get(
-                [this.url]
-            , data => {
-                let result = {};
-                if (data[this.url]) {
-                    result = data[this.url];
-                }
-                resove(name ? result[name] : result[this.url]);
+        let data = JSON.parse(localStorage.getItem(this.url))
+        return name ? data[name] : data
+    }
+    @decoErrFn
+    remove(names) {
+        let data = this.get();
+        if(Array.isArray(names)) {
+            names.forEach(name => {
+                delete data[name];
             })
-        })
+        } else {
+            delete data[names];
+        }
+        this.set(null, data);
+
     }
 }
 
 function decoErrFn(target, name, descriptor) {
     let fn = descriptor.value;
     descriptor.value = function() {
-        return fn.apply(this, arguments).catch(e => {
-            console.error('chrome storage error:' + e);
-        })
+        try {
+            return fn.apply(this, arguments)
+        } catch(e) {
+            console.error('stroage error')
+        }
     }
 }
 
