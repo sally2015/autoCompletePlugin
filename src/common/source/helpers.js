@@ -12,7 +12,6 @@ import isMobile from './isMobile';
  */
 export const genAction = function (e, opts) {
     // console.log(Date.now(), e, getSelector(e.srcElement));
-
     var target = e.target,
         srcElement = e.srcElement,
         tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '';
