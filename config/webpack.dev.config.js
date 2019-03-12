@@ -1,10 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
 const background = path.resolve(__dirname, '../src/background.js');
-var loaders = [
-    'style-loader',
-    'css-loader',
-]
 module.exports = {
   context: path.resolve(__dirname, '..'),
   mode: 'development',
@@ -33,35 +29,7 @@ module.exports = {
                 }
             }]
         },
-    { test: /\.less$/, loader: 'style-loader!css-loader!less-loader!' },
-    {
-        test: /\.css/,
-        use: loaders
-    },
-    {
-        test: /\.(jpg|png|gif|svg)$/,
-        use: [
-            {
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'assets/[name].[hash:4].[ext]'
-                }
-            }
-        ]
-    },
-    {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: [
-            {
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'assets/[name].[hash:4].[ext]'
-                }
-            }
-        ]
-    },
+      { test: /\.less$/, loader: 'style!css!less!sourceMap' }
     ]
   },
   resolve: {

@@ -7,7 +7,7 @@ const clean = require('./clean');
 const webpackDevConfig = require('../config/webpack.dev.config.js');
 const buildPath = path.resolve(__dirname, '../build');
 function webpackDev(cb) {
-    let port = 3000;
+    let port = 3009;
     for (let e in webpackDevConfig.entry) {
       webpackDevConfig.entry[e].push(`webpack-dev-server/client?http://localhost:${port}`, 'webpack/hot/dev-server');
     }

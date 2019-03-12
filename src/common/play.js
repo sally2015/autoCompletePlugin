@@ -2,10 +2,18 @@ class Play{
     constructor(){
         this.currentEle = null;
         this.executeArr = [];
+        this.delay = 500;
     }
-    run(paths = []) {
+    async run(paths = []) {
         this.parser(paths);
-        this.executeArr.forEach((item) => item.execute())
+        let promiseAll = [];
+        this.executeArr.forEach((item) => {
+            promiseAll.push(item.execute)
+        });
+        
+        for (let i = 0; i < promiseAll.length; i++) {
+            await promiseAll[i]();
+        }
     }
     parser(paths) {
         this.executeArr = paths.map(item => {
@@ -14,16 +22,26 @@ class Play{
             let _self = this;
             return {
                 execute() {
-                    _self[event](ele, innerText);
+                    return _self[event](selector, innerText, item);
                 }
             }
         });
     }
-    click(ele) {
-        ele.click();
+    click(selector) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                this.getEle(selector).click();
+                resolve();
+            }, this.delay)
+        })
     }
-    input(ele, text) {
-        ele.value = text;
+    input(selector, text) {
+        new Promise((resolve) => {
+            setTimeout(() => {
+                this.getEle(selector).value = text;
+                resolve();
+            }, this.delay)
+        })
     }
     getEle(name) {
         return document.body.querySelector(name);

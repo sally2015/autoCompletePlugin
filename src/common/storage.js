@@ -4,22 +4,24 @@ class Storage {
     constructor(url) {
         this.url = url;
     }
-    @decoErrFn
+    // @decoErrFn
     set(name, obj) {
-        let data = this.get() || {};
+        let data = this.get();
+        let result = {}
         if (name) {
-            data = Object.assign(data, {
-                [name]: obj
+            obj.forEach((item) => delete item.target);
+            result = Object.assign({}, data, {
+                [name+'']: obj
             })
         } else {
-            data = obj;
+            result = obj;
         }
         localStorage.setItem(this.url,
-            JSON.stringify(data))
+            JSON.stringify(result))
     }
     @decoErrFn
     get(name) {
-        let data = JSON.parse(localStorage.getItem(this.url))
+        let data = JSON.parse(localStorage.getItem(this.url)) || {}
         return name ? data[name] : data
     }
     @decoErrFn
@@ -43,7 +45,7 @@ function decoErrFn(target, name, descriptor) {
         try {
             return fn.apply(this, arguments)
         } catch(e) {
-            console.error('stroage error')
+            console.error('stroage error' + e)
         }
     }
 }

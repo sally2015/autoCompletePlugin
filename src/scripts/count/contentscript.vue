@@ -1,11 +1,14 @@
 
 <template>
-<div id="ignoreArea">
-    <div class="toggle-button" @click="toggleLayout">{{layoutShow ? '收起' : '展开'}}</div>
+<div class="ignoreArea">
+    <div class="toggle-button" @click.stop="toggleLayout">
+        <Icon class="ignoreArea" v-if="layoutShow" type="ios-arrow-back" />
+        <Icon class="ignoreArea" v-else type="ios-arrow-forward" />
+    </div>
     <div class="extension_layout" v-show="layoutShow">
         <Row class="mb-20">
             <Col span="8" push="8">
-                <Button icon="ios-add" :type="isRecord ? 'error': 'primary'" @click="change">{{isRecord ? '录制中' : '录制'}}</Button>
+                <Button class="ignoreArea" icon="ios-add" :type="isRecord ? 'error': 'primary'" @click.stop="change">{{isRecord ? '录制中' : '录制'}}</Button>
             </Col>
         </Row>
         <Row class="mb-20">
@@ -17,10 +20,10 @@
         </Row>
         <Row class="mb-20">
             <Col span="8" push="2">
-                <Button type="primary" @click="run">执行</Button>
+                <Button class="ignoreArea" type="primary" @click.stop="run">执行</Button>
             </Col>
             <Col span="8" push="6">
-                <Button @click="del">删除</Button>
+                <Button class="ignoreArea" @click.stop="del">删除</Button>
             </Col>
         </Row>
         <Modal
@@ -61,7 +64,7 @@
     methods: {
         query() {
             let data = storage.get();
-            this.list = data;
+            this.list = data || {};
             this.keys = Object.keys(this.list);
         },
         change() {
@@ -131,15 +134,22 @@
     transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 .toggle-button{
-    width: 50px;
+    font-size: 16px;
+    padding: 6px;
     z-index: 10001;
+    background-color: #eff3f6;
+    background-image: linear-gradient(-180deg,#fafbfc,#eff3f6 90%);
+    border: 1px solid rgba(27,31,35,.2);
+    border-radius: 4px;
     position: fixed;
     left: 0;
     top: 0;
-    background: #ccc;
     text-align: center;
-    border-radius: 4px;
     cursor: pointer;
+    line-height: 14px;
+}
+.toggle-button:hover{
+    background: #ededed;
 }
 .mb-20{
     margin-bottom: 20px;
