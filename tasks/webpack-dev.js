@@ -1,25 +1,25 @@
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const devServer = require('webpack-dev-server');
-const fs = require('fs');
-const gulp = require('gulp');
-const clean = require('./clean');
+const entries = require('./entries')
 const webpackDevConfig = require('../config/webpack.dev.config.js');
-const buildPath = path.resolve(__dirname, '../build');
+const devPath = path.resolve(__dirname, '../dev');
+
 function webpackDev(cb) {
     let port = 3009;
+    entries(webpackDevConfig);
+    
     for (let e in webpackDevConfig.entry) {
       webpackDevConfig.entry[e].push(`webpack-dev-server/client?http://localhost:${port}`, 'webpack/hot/dev-server');
     }
-
-  
     let config = webpackDevConfig;
     let compiler = webpack(config);
     compiler.hooks.emit.tap({name: 'outputDiskPlugin'}, (compilation) => {
       const assets = compilation.assets;
       let file, data, fileDir;
       Object.keys(assets).forEach(key => {
-        file = path.resolve(buildPath, key);
+        file = path.resolve(devPath, key);
         fileDir = path.dirname(file);
         if (!fs.existsSync(fileDir)) {
           fs.mkdirSync(fileDir);
@@ -30,7 +30,7 @@ function webpackDev(cb) {
     });
   
     let server = new devServer(compiler, {
-      contentBase: '../build',
+      contentBase: '../dev',
       hot: true,
       inline: true,
       clientLogLevel: 'none',
@@ -40,7 +40,7 @@ function webpackDev(cb) {
       }
     });
     server.listen(port, '127.0.0.1', function() { });
-    cb();
+    cb && cb();
   }
 
-  module.exports = webpackDev;
+webpackDev();

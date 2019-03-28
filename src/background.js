@@ -1,4 +1,4 @@
 import '../src/scripts/count/background'
 import { info } from './common/log';
 
-info('12df');
+info('1');

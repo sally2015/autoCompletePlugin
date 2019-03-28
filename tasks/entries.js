@@ -1,7 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-let webpackDevConfig = require('../config/webpack.dev.config.js');
-let webpackBuildConfig = require('../config/webpack.build.config.js');
 
 let getTime = function() {
     let now = new Date();
@@ -11,7 +9,7 @@ let getTime = function() {
     return `[${h}:${m}:${s}]`;
   };
   
-function entries(cb) {
+function entries(config) {
     const bizDir = path.resolve(__dirname, '../src/scripts/');
     const allBiz = fs.readdirSync(bizDir);
     let entrys = {};
@@ -30,10 +28,7 @@ function entries(cb) {
       }
     });
     console.log(`${getTime()} 添加入口： ${entryName}`);
-    entrys['background'] = webpackDevConfig.entry.background;
-    webpackDevConfig.entry = entrys;
-    webpackBuildConfig.entry = entrys;
-    console.log(entrys, '22222')
-    cb();
+    entrys['background'] = config.entry.background;
+    config.entry = entrys;
 }
 module.exports = entries

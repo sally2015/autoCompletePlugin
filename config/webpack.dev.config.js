@@ -1,14 +1,18 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const devPath = path.resolve(__dirname, '../dev');
 const background = path.resolve(__dirname, '../src/background.js');
 module.exports = {
+  watch: true,
   context: path.resolve(__dirname, '..'),
   mode: 'development',
   entry: {
     background: [background],
   },
   output: {
-    path: path.resolve(__dirname, '../build'),
+    path: path.resolve(__dirname, '../dev'),
     filename: '[name].js',
     sourceMapFilename: './sourcemap/[file].map'
   },
@@ -46,7 +50,18 @@ module.exports = {
       'process.env': {
         'NODE_ENV': '"development"'
       }
-    })
+    }),
+    new CleanWebpackPlugin(),
+    new CopyPlugin([
+      {
+        from: path.resolve(__dirname, '../config/reload.js'),
+        to: path.resolve(__dirname, '../dev/reload.js'),
+      },
+      {
+        from: path.resolve(__dirname, '../src/manifest.dev.json'),
+        to: path.resolve(__dirname, '../dev/manifest.json'),
+      }
+    ])
   ],
   devtool: '#source-map'
 };

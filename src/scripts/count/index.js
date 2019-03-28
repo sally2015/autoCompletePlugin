@@ -7,7 +7,6 @@ const link = document.createElement('link');
 link.href = 'https://unpkg.com/iview@3.3.0/dist/styles/iview.css';
 link.rel = 'stylesheet';
 link.type = 'text/css';
-
 document.head.appendChild(link);
 document.body.appendChild(el);
 Vue.use(iview);

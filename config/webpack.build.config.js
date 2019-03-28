@@ -1,6 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
-
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   entry: {
     background: [
@@ -24,9 +24,10 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': '"producttion"'
+        'NODE_ENV': '"production"'
       }
-    })
+    }),
+    new CleanWebpackPlugin(['./build'])
   ],
   color: true
 };
