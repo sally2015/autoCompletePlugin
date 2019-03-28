@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const fsExtra = require('fs-extra')
 const webpack = require('webpack');
 const devServer = require('webpack-dev-server');
 const entries = require('./entries')
@@ -27,6 +28,8 @@ function webpackDev(cb) {
         data = assets[key].source();
         fs.writeFileSync(file, data);
       });
+      fsExtra.copySync(path.resolve(__dirname, '../config/reload.js'), path.resolve(__dirname, '../dev/reload.js'));
+      fsExtra.copySync(path.resolve(__dirname, '../src/manifest.dev.json'), path.resolve(__dirname, '../dev/manifest.json'));
     });
   
     let server = new devServer(compiler, {

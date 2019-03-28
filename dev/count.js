@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "52f99372268bec4e5cac";
+/******/ 	var hotCurrentHash = "2fce0f13fc7959007497";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1059,6 +1059,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1068,6 +1076,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
     data() {
         return {
+            delay: 300,
             actionPaths: [],
             list: [],
             keys: [],
@@ -1129,7 +1138,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     mounted() {
         this.query();
-        this.executor = new _common_play__WEBPACK_IMPORTED_MODULE_4___default.a();
+        this.executor = new _common_play__WEBPACK_IMPORTED_MODULE_4___default.a(this.Play);
         _common_source__WEBPACK_IMPORTED_MODULE_2___default()(content => {
             if (this.isRecord && content.selector.indexOf('ignoreArea') === -1) {
                 this.actionPaths.push(content);
@@ -55629,29 +55638,64 @@ var render = function() {
           { staticClass: "mb-20" },
           [
             _c(
-              "Col",
-              { attrs: { span: "24" } },
+              "Form",
+              { attrs: { "label-position": "top" } },
               [
                 _c(
-                  "Select",
-                  {
-                    staticStyle: { width: "100%" },
-                    attrs: { multiple: "" },
-                    model: {
-                      value: _vm.selectedArr,
-                      callback: function($$v) {
-                        _vm.selectedArr = $$v
+                  "FormItem",
+                  { attrs: { label: "延迟时间:" } },
+                  [
+                    _c(
+                      "Input",
+                      {
+                        attrs: { placeholder: "默认为300毫秒" },
+                        model: {
+                          value: _vm.delay,
+                          callback: function($$v) {
+                            _vm.delay = $$v
+                          },
+                          expression: "delay"
+                        }
                       },
-                      expression: "selectedArr"
-                    }
-                  },
-                  _vm._l(_vm.keys, function(item, index) {
-                    return _c(
-                      "Option",
-                      { key: index, attrs: { value: item } },
-                      [_vm._v(_vm._s(item))]
+                      [
+                        _c(
+                          "span",
+                          { attrs: { slot: "append" }, slot: "append" },
+                          [_vm._v("ms")]
+                        )
+                      ]
                     )
-                  }),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "FormItem",
+                  { attrs: { label: "执行id:" } },
+                  [
+                    _c(
+                      "Select",
+                      {
+                        staticStyle: { width: "100%" },
+                        attrs: { multiple: "" },
+                        model: {
+                          value: _vm.selectedArr,
+                          callback: function($$v) {
+                            _vm.selectedArr = $$v
+                          },
+                          expression: "selectedArr"
+                        }
+                      },
+                      _vm._l(_vm.keys, function(item, index) {
+                        return _c(
+                          "Option",
+                          { key: index, attrs: { value: item } },
+                          [_vm._v(_vm._s(item))]
+                        )
+                      }),
+                      1
+                    )
+                  ],
                   1
                 )
               ],
@@ -68869,12 +68913,12 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Play = function () {
-    function Play() {
+    function Play(delay) {
         (0, _classCallCheck3.default)(this, Play);
 
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = 500;
+        this.delay = delay || 300;
     }
 
     (0, _createClass3.default)(Play, [{

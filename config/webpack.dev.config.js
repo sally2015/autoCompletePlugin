@@ -52,16 +52,6 @@ module.exports = {
       }
     }),
     new CleanWebpackPlugin(),
-    new CopyPlugin([
-      {
-        from: path.resolve(__dirname, '../config/reload.js'),
-        to: path.resolve(__dirname, '../dev/reload.js'),
-      },
-      {
-        from: path.resolve(__dirname, '../src/manifest.dev.json'),
-        to: path.resolve(__dirname, '../dev/manifest.json'),
-      }
-    ])
   ],
   devtool: '#source-map'
 };

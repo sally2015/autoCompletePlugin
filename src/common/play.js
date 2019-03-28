@@ -1,8 +1,8 @@
 class Play{
-    constructor(){
+    constructor(delay){
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = 500;
+        this.delay = delay || 300;
     }
     async run(paths = []) {
         this.parser(paths);

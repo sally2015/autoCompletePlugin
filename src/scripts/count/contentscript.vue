@@ -12,11 +12,19 @@
             </Col>
         </Row>
         <Row class="mb-20">
-            <Col span="24">
-                <Select v-model="selectedArr" style="width:100%" multiple>
-                    <Option v-for="(item, index) in keys" :value="item" :key="index">{{item}}</Option>
-                </Select>       
-            </Col>
+            <Form label-position="top">
+                <FormItem label="延迟时间:">
+                    <Input v-model="delay" placeholder="默认为300毫秒">
+                        <span slot="append">ms</span>
+                    </Input>
+                </FormItem>
+                <FormItem label="执行id:">
+                    <Select v-model="selectedArr" style="width:100%" multiple>
+                        <Option v-for="(item, index) in keys" :value="item" :key="index">{{item}}</Option>
+                    </Select>
+                </FormItem>
+                
+            </Form>
         </Row>
         <Row class="mb-20">
             <Col span="8" push="2">
@@ -50,6 +58,7 @@
   export default {
     data() {
       return {
+        delay: 300,
         actionPaths: [],
         list: [],
         keys: [],
@@ -111,7 +120,7 @@
     },
     mounted() {
         this.query();
-        this.executor = new Play();
+        this.executor = new Play(this.Play);
         initRecord((content) => {
             if(this.isRecord && (content.selector.indexOf('ignoreArea') === -1)) {
                 this.actionPaths.push(content);
