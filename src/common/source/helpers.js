@@ -17,6 +17,7 @@ export const genAction = function (e, opts) {
         srcElement = e.srcElement,
         tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '',
         timeStamp = +new Date();
+        console.log(sg.getSelector(srcElement))
     return {
         timeStamp,
         url: window.location.href,

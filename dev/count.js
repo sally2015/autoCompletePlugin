@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "d97d7250d6cf123f6aaa";
+/******/ 	var hotCurrentHash = "dd40613de09b80a68eee";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1130,7 +1130,7 @@ __webpack_require__.r(__webpack_exports__);
             this.selectedArr.forEach(selected => {
                 paths = paths.concat(_common_storage__WEBPACK_IMPORTED_MODULE_3___default.a.get(selected));
             });
-            this.executor.run(paths, () => {
+            this.executor.run(paths, this.delay, () => {
                 this.$Message.success('执行成功');
             });
         },
@@ -56643,7 +56643,7 @@ var render = function() {
                       "Input",
                       {
                         staticClass: "ignoreArea",
-                        attrs: { placeholder: "默认为300毫秒" },
+                        attrs: { placeholder: "默认为录制时的时间间隔" },
                         model: {
                           value: _vm.delay,
                           callback: function($$v) {
@@ -69960,11 +69960,11 @@ var Play = function () {
 
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = delay || 0;
+        this.delay = isNaN(delay) ? 0 : delay;
     }
 
     (0, _createClass3.default)(Play, [{
-        key: 'run',
+        key: "run",
         value: function () {
             var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 var paths = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -69996,7 +69996,7 @@ var Play = function () {
                             case 8:
                                 item = _context.sent;
 
-                                this.lastTimeStamp = item.timeStamp;
+                                this.lastTimeStamp = item ? item.timeStamp : this.delay;
 
                             case 10:
                                 i++;
@@ -70007,7 +70007,7 @@ var Play = function () {
                                 cb && cb();
 
                             case 14:
-                            case 'end':
+                            case "end":
                                 return _context.stop();
                         }
                     }
@@ -70021,7 +70021,7 @@ var Play = function () {
             return run;
         }()
     }, {
-        key: 'parser',
+        key: "parser",
         value: function parser(paths) {
             var _this = this;
 
@@ -70038,40 +70038,38 @@ var Play = function () {
             });
         }
     }, {
-        key: 'click',
+        key: "click",
         value: function click(selector, item) {
             var _this2 = this;
 
             return new _promise2.default(function (resolve) {
                 setTimeout(function () {
-                    console.log('delay', _this2.adaptDelay(item), selector);
                     _this2.getEle(selector).click();
                     resolve(item);
                 }, _this2.adaptDelay(item));
             });
         }
     }, {
-        key: 'contextmenu',
+        key: "contextmenu",
         value: function contextmenu(selector, item) {
             return this.click(selector, item);
         }
     }, {
-        key: 'input',
+        key: "input",
         value: function input(selector, item) {
             var _this3 = this;
 
             new _promise2.default(function (resolve) {
                 setTimeout(function () {
-                    console.log('delay', _this3.adaptDelay(item));
                     _this3.getEle(selector).value = item.innerText;
                     resolve(item);
                 }, _this3.adaptDelay(item));
             });
         }
     }, {
-        key: 'adaptDelay',
+        key: "adaptDelay",
         value: function adaptDelay(item) {
-            if (this.delay) {
+            if (isNaN(this.delay)) {
                 return this.delay;
             }
             if (this.lastTimeStamp) {
@@ -70080,7 +70078,7 @@ var Play = function () {
             return 0;
         }
     }, {
-        key: 'getEle',
+        key: "getEle",
         value: function getEle(name) {
             return document.body.querySelector(name);
         }
@@ -70302,6 +70300,7 @@ var genAction = exports.genAction = function genAction(e, opts) {
         srcElement = e.srcElement,
         tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '',
         timeStamp = +new Date();
+    console.log(sg.getSelector(srcElement));
     return {
         timeStamp: timeStamp,
         url: window.location.href,

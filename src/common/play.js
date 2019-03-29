@@ -2,7 +2,7 @@ class Play{
     constructor(delay){
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = delay || 0;
+        this.delay = isNaN(delay) ? 0 : delay;
     }
     async run(paths = [], cb) {
         this.lastTimeStamp = 0;
@@ -14,7 +14,7 @@ class Play{
         
         for (let i = 0; i < promiseAll.length; i++) {
             let item = await promiseAll[i]();
-            this.lastTimeStamp = item.timeStamp
+            this.lastTimeStamp = item ? item.timeStamp : this.delay;
         }
         cb && cb();
     }
@@ -32,7 +32,6 @@ class Play{
     click(selector, item) {
         return new Promise((resolve) => {
             setTimeout(() => {
-                console.log('delay',this.adaptDelay(item), selector)
                 this.getEle(selector).click();
                 resolve(item);
             }, this.adaptDelay(item))
@@ -44,14 +43,13 @@ class Play{
     input(selector, item) {
         new Promise((resolve) => {
             setTimeout(() => {
-                console.log('delay',this.adaptDelay(item))
                 this.getEle(selector).value = item.innerText;
                 resolve(item);
             }, this.adaptDelay(item))
         })
     }
     adaptDelay(item) {
-        if (this.delay) {
+        if (isNaN(this.delay)) {
             return this.delay;
         }
         if (this.lastTimeStamp) {

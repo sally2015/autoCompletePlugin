@@ -14,7 +14,7 @@
         <Row class="mb-20">
             <Form label-position="top">
                 <FormItem label="延迟时间:">
-                    <Input class="ignoreArea" v-model="delay" placeholder="默认为300毫秒">
+                    <Input class="ignoreArea" v-model="delay" placeholder="默认为录制时的时间间隔">
                         <span class="ignoreArea" slot="append">ms</span>
                     </Input>
                 </FormItem>
@@ -112,7 +112,7 @@
             this.selectedArr.forEach(selected => {
                 paths = paths.concat(storage.get(selected));
             })
-            this.executor.run(paths, () => {
+            this.executor.run(paths, this.delay, () => {
                 this.$Message.success('执行成功')
             });
         },
