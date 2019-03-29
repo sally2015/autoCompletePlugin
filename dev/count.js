@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "2fce0f13fc7959007497";
+/******/ 	var hotCurrentHash = "d97d7250d6cf123f6aaa";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1076,7 +1076,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
     data() {
         return {
-            delay: 300,
+            delay: 0,
             actionPaths: [],
             list: [],
             keys: [],
@@ -1130,7 +1130,9 @@ __webpack_require__.r(__webpack_exports__);
             this.selectedArr.forEach(selected => {
                 paths = paths.concat(_common_storage__WEBPACK_IMPORTED_MODULE_3___default.a.get(selected));
             });
-            this.executor.run(paths);
+            this.executor.run(paths, () => {
+                this.$Message.success('执行成功');
+            });
         },
         toggleLayout() {
             this.layoutShow = !this.layoutShow;
@@ -1138,7 +1140,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     mounted() {
         this.query();
-        this.executor = new _common_play__WEBPACK_IMPORTED_MODULE_4___default.a(this.Play);
+        this.executor = new _common_play__WEBPACK_IMPORTED_MODULE_4___default.a();
         _common_source__WEBPACK_IMPORTED_MODULE_2___default()(content => {
             if (this.isRecord && content.selector.indexOf('ignoreArea') === -1) {
                 this.actionPaths.push(content);
@@ -3728,6 +3730,367 @@ function toComment(sourceMap) {
   var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
   return '/*# ' + data + ' */';
 }
+
+/***/ }),
+
+/***/ "./node_modules/css-selector-generator/build/css-selector-generator.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/css-selector-generator/build/css-selector-generator.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
+  var CssSelectorGenerator, root,
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  CssSelectorGenerator = (function() {
+    CssSelectorGenerator.prototype.default_options = {
+      selectors: ['id', 'class', 'tag', 'nthchild'],
+      prefix_tag: false,
+      attribute_blacklist: [],
+      attribute_whitelist: [],
+      quote_attribute_when_needed: false,
+      id_blacklist: [],
+      class_blacklist: []
+    };
+
+    function CssSelectorGenerator(options) {
+      if (options == null) {
+        options = {};
+      }
+      this.options = {};
+      this.setOptions(this.default_options);
+      this.setOptions(options);
+    }
+
+    CssSelectorGenerator.prototype.setOptions = function(options) {
+      var key, results, val;
+      if (options == null) {
+        options = {};
+      }
+      results = [];
+      for (key in options) {
+        val = options[key];
+        if (this.default_options.hasOwnProperty(key)) {
+          results.push(this.options[key] = val);
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    };
+
+    CssSelectorGenerator.prototype.isElement = function(element) {
+      return !!((element != null ? element.nodeType : void 0) === 1);
+    };
+
+    CssSelectorGenerator.prototype.getParents = function(element) {
+      var current_element, result;
+      result = [];
+      if (this.isElement(element)) {
+        current_element = element;
+        while (this.isElement(current_element)) {
+          result.push(current_element);
+          current_element = current_element.parentNode;
+        }
+      }
+      return result;
+    };
+
+    CssSelectorGenerator.prototype.getTagSelector = function(element) {
+      return this.sanitizeItem(element.tagName.toLowerCase());
+    };
+
+    CssSelectorGenerator.prototype.sanitizeItem = function(item) {
+      var characters;
+      characters = (item.split('')).map(function(character) {
+        if (character === ':') {
+          return "\\" + (':'.charCodeAt(0).toString(16).toUpperCase()) + " ";
+        } else if (/[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/.test(character)) {
+          return "\\" + character;
+        } else {
+          return escape(character).replace(/\%/g, '\\');
+        }
+      });
+      return characters.join('');
+    };
+
+    CssSelectorGenerator.prototype.sanitizeAttribute = function(item) {
+      var characters;
+      if (this.options.quote_attribute_when_needed) {
+        return this.quoteAttribute(item);
+      }
+      characters = (item.split('')).map(function(character) {
+        if (character === ':') {
+          return "\\" + (':'.charCodeAt(0).toString(16).toUpperCase()) + " ";
+        } else if (/[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/.test(character)) {
+          return "\\" + character;
+        } else {
+          return escape(character).replace(/\%/g, '\\');
+        }
+      });
+      return characters.join('');
+    };
+
+    CssSelectorGenerator.prototype.quoteAttribute = function(item) {
+      var characters, quotesNeeded;
+      quotesNeeded = false;
+      characters = (item.split('')).map(function(character) {
+        if (character === ':') {
+          quotesNeeded = true;
+          return character;
+        } else if (character === "'") {
+          quotesNeeded = true;
+          return "\\" + character;
+        } else {
+          quotesNeeded = quotesNeeded || (escape(character === !character));
+          return character;
+        }
+      });
+      if (quotesNeeded) {
+        return "'" + (characters.join('')) + "'";
+      }
+      return characters.join('');
+    };
+
+    CssSelectorGenerator.prototype.getIdSelector = function(element) {
+      var id, id_blacklist, prefix, sanitized_id;
+      prefix = this.options.prefix_tag ? this.getTagSelector(element) : '';
+      id = element.getAttribute('id');
+      id_blacklist = this.options.id_blacklist.concat(['', /\s/, /^\d/]);
+      if (id && (id != null) && (id !== '') && this.notInList(id, id_blacklist)) {
+        sanitized_id = prefix + ("#" + (this.sanitizeItem(id)));
+        if (element.ownerDocument.querySelectorAll(sanitized_id).length === 1) {
+          return sanitized_id;
+        }
+      }
+      return null;
+    };
+
+    CssSelectorGenerator.prototype.notInList = function(item, list) {
+      return !list.find(function(x) {
+        if (typeof x === 'string') {
+          return x === item;
+        }
+        return x.exec(item);
+      });
+    };
+
+    CssSelectorGenerator.prototype.getClassSelectors = function(element) {
+      var class_string, item, k, len, ref, result;
+      result = [];
+      class_string = element.getAttribute('class');
+      if (class_string != null) {
+        class_string = class_string.replace(/\s+/g, ' ');
+        class_string = class_string.replace(/^\s|\s$/g, '');
+        if (class_string !== '') {
+          ref = class_string.split(/\s+/);
+          for (k = 0, len = ref.length; k < len; k++) {
+            item = ref[k];
+            if (this.notInList(item, this.options.class_blacklist)) {
+              result.push("." + (this.sanitizeItem(item)));
+            }
+          }
+        }
+      }
+      return result;
+    };
+
+    CssSelectorGenerator.prototype.getAttributeSelectors = function(element) {
+      var a, attr, blacklist, k, l, len, len1, ref, ref1, ref2, result, whitelist;
+      result = [];
+      whitelist = this.options.attribute_whitelist;
+      for (k = 0, len = whitelist.length; k < len; k++) {
+        attr = whitelist[k];
+        if (element.hasAttribute(attr)) {
+          result.push("[" + attr + "=" + (this.sanitizeAttribute(element.getAttribute(attr))) + "]");
+        }
+      }
+      blacklist = this.options.attribute_blacklist.concat(['id', 'class']);
+      ref = element.attributes;
+      for (l = 0, len1 = ref.length; l < len1; l++) {
+        a = ref[l];
+        if (!((ref1 = a.nodeName, indexOf.call(blacklist, ref1) >= 0) || (ref2 = a.nodeName, indexOf.call(whitelist, ref2) >= 0))) {
+          result.push("[" + a.nodeName + "=" + (this.sanitizeAttribute(a.nodeValue)) + "]");
+        }
+      }
+      return result;
+    };
+
+    CssSelectorGenerator.prototype.getNthChildSelector = function(element) {
+      var counter, k, len, parent_element, prefix, sibling, siblings;
+      parent_element = element.parentNode;
+      prefix = this.options.prefix_tag ? this.getTagSelector(element) : '';
+      if (parent_element != null) {
+        counter = 0;
+        siblings = parent_element.childNodes;
+        for (k = 0, len = siblings.length; k < len; k++) {
+          sibling = siblings[k];
+          if (this.isElement(sibling)) {
+            counter++;
+            if (sibling === element) {
+              return prefix + (":nth-child(" + counter + ")");
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    CssSelectorGenerator.prototype.testSelector = function(element, selector) {
+      var is_unique, result;
+      is_unique = false;
+      if ((selector != null) && selector !== '') {
+        result = element.ownerDocument.querySelectorAll(selector);
+        if (result.length === 1 && result[0] === element) {
+          is_unique = true;
+        }
+      }
+      return is_unique;
+    };
+
+    CssSelectorGenerator.prototype.testUniqueness = function(element, selector) {
+      var found_elements, parent;
+      parent = element.parentNode;
+      found_elements = parent.querySelectorAll(selector);
+      return found_elements.length === 1 && found_elements[0] === element;
+    };
+
+    CssSelectorGenerator.prototype.testCombinations = function(element, items, tag) {
+      var item, k, l, len, len1, len2, len3, m, n, ref, ref1, ref2, ref3;
+      if (tag == null) {
+        tag = this.getTagSelector(element);
+      }
+      if (!this.options.prefix_tag) {
+        ref = this.getCombinations(items);
+        for (k = 0, len = ref.length; k < len; k++) {
+          item = ref[k];
+          if (this.testSelector(element, item)) {
+            return item;
+          }
+        }
+        ref1 = this.getCombinations(items);
+        for (l = 0, len1 = ref1.length; l < len1; l++) {
+          item = ref1[l];
+          if (this.testUniqueness(element, item)) {
+            return item;
+          }
+        }
+      }
+      ref2 = this.getCombinations(items).map(function(item) {
+        return tag + item;
+      });
+      for (m = 0, len2 = ref2.length; m < len2; m++) {
+        item = ref2[m];
+        if (this.testSelector(element, item)) {
+          return item;
+        }
+      }
+      ref3 = this.getCombinations(items).map(function(item) {
+        return tag + item;
+      });
+      for (n = 0, len3 = ref3.length; n < len3; n++) {
+        item = ref3[n];
+        if (this.testUniqueness(element, item)) {
+          return item;
+        }
+      }
+      return null;
+    };
+
+    CssSelectorGenerator.prototype.getUniqueSelector = function(element) {
+      var k, len, ref, selector, selector_type, selectors, tag_selector;
+      tag_selector = this.getTagSelector(element);
+      ref = this.options.selectors;
+      for (k = 0, len = ref.length; k < len; k++) {
+        selector_type = ref[k];
+        switch (selector_type) {
+          case 'id':
+            selector = this.getIdSelector(element);
+            break;
+          case 'tag':
+            if (tag_selector && this.testUniqueness(element, tag_selector)) {
+              selector = tag_selector;
+            }
+            break;
+          case 'class':
+            selectors = this.getClassSelectors(element);
+            if ((selectors != null) && selectors.length !== 0) {
+              selector = this.testCombinations(element, selectors, tag_selector);
+            }
+            break;
+          case 'attribute':
+            selectors = this.getAttributeSelectors(element);
+            if ((selectors != null) && selectors.length !== 0) {
+              selector = this.testCombinations(element, selectors, tag_selector);
+            }
+            break;
+          case 'nthchild':
+            selector = this.getNthChildSelector(element);
+        }
+        if (selector) {
+          return selector;
+        }
+      }
+      return '*';
+    };
+
+    CssSelectorGenerator.prototype.getSelector = function(element) {
+      var item, k, len, parents, result, selector, selectors;
+      selectors = [];
+      parents = this.getParents(element);
+      for (k = 0, len = parents.length; k < len; k++) {
+        item = parents[k];
+        selector = this.getUniqueSelector(item);
+        if (selector != null) {
+          selectors.unshift(selector);
+          result = selectors.join(' > ');
+          if (this.testSelector(element, result)) {
+            return result;
+          }
+        }
+      }
+      return null;
+    };
+
+    CssSelectorGenerator.prototype.getCombinations = function(items) {
+      var i, j, k, l, ref, ref1, result;
+      if (items == null) {
+        items = [];
+      }
+      result = [[]];
+      for (i = k = 0, ref = items.length - 1; 0 <= ref ? k <= ref : k >= ref; i = 0 <= ref ? ++k : --k) {
+        for (j = l = 0, ref1 = result.length - 1; 0 <= ref1 ? l <= ref1 : l >= ref1; j = 0 <= ref1 ? ++l : --l) {
+          result.push(result[j].concat(items[i]));
+        }
+      }
+      result.shift();
+      result = result.sort(function(a, b) {
+        return a.length - b.length;
+      });
+      result = result.map(function(item) {
+        return item.join('');
+      });
+      return result;
+    };
+
+    return CssSelectorGenerator;
+
+  })();
+
+  if ( true && __webpack_require__(/*! !webpack amd define */ "./node_modules/webpack/buildin/amd-define.js") !== null ? __webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js") : void 0) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+      return CssSelectorGenerator;
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {
+    root =  true && exports !== null ? exports : this;
+    root.CssSelectorGenerator = CssSelectorGenerator;
+  }
+
+}).call(this);
+
 
 /***/ }),
 
@@ -54377,6 +54740,637 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/unique-selector/lib/getAttributes.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getAttributes.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getAttributes = getAttributes;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/**
+ * Returns the Attribute selectors of the element
+ * @param  { DOM Element } element
+ * @param  { Array } array of attributes to ignore
+ * @return { Array }
+ */
+function getAttributes(el) {
+  var attributesToIgnore = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['id', 'class', 'length'];
+  var attributes = el.attributes;
+
+  var attrs = [].concat(_toConsumableArray(attributes));
+
+  return attrs.reduce(function (sum, next) {
+    if (!(attributesToIgnore.indexOf(next.nodeName) > -1)) {
+      sum.push('[' + next.nodeName + '="' + next.value + '"]');
+    }
+    return sum;
+  }, []);
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getClasses.js":
+/*!********************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getClasses.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getClasses = getClasses;
+exports.getClassSelectors = getClassSelectors;
+/**
+ * Get class names for an element
+ *
+ * @pararm { Element } el
+ * @return { Array }
+ */
+function getClasses(el) {
+  if (!el.hasAttribute('class')) {
+    return [];
+  }
+
+  try {
+    var classList = Array.prototype.slice.call(el.classList);
+
+    // return only the valid CSS selectors based on RegEx
+    return classList.filter(function (item) {
+      return !/^[a-z_-][a-z\d_-]*$/i.test(item) ? null : item;
+    });
+  } catch (e) {
+    var className = el.getAttribute('class');
+
+    // remove duplicate and leading/trailing whitespaces
+    className = className.trim().replace(/\s+/g, ' ');
+
+    // split into separate classnames
+    return className.split(' ');
+  }
+}
+
+/**
+ * Returns the Class selectors of the element
+ * @param  { Object } element
+ * @return { Array }
+ */
+function getClassSelectors(el) {
+  var classList = getClasses(el).filter(Boolean);
+  return classList.map(function (cl) {
+    return '.' + cl;
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getCombinations.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getCombinations.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.getCombinations = getCombinations;
+/**
+ * Recursively combinate items.
+ * @param  { Array } result
+ * @param  { Array } items
+ * @param  { Array } data
+ * @param  { Number } start
+ * @param  { Number } end
+ * @param  { Number } index
+ * @param  { Number } k
+ */
+function kCombinations(result, items, data, start, end, index, k) {
+    if (index === k) {
+        result.push(data.slice(0, index).join(''));
+        return;
+    }
+
+    for (var i = start; i <= end && end - i + 1 >= k - index; ++i) {
+        data[index] = items[i];
+        kCombinations(result, items, data, i + 1, end, index + 1, k);
+    }
+}
+
+/**
+ * Returns all the possible selector combinations
+ * @param  { Array } items
+ * @param  { Number } k
+ * @return { Array }
+ */
+function getCombinations(items, k) {
+    var result = [],
+        n = items.length,
+        data = [];
+
+    for (var l = 1; l <= k; ++l) {
+        kCombinations(result, items, data, 0, n - 1, 0, l);
+    }
+
+    return result;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getID.js":
+/*!***************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getID.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getID = getID;
+/**
+ * Returns the Tag of the element
+ * @param  { Object } element
+ * @return { String }
+ */
+function getID(el) {
+  var id = el.getAttribute('id');
+
+  if (id !== null && id !== '') {
+    // if the ID starts with a number selecting with a hash will cause a DOMException
+    return id.match(/^\d/) ? '[id="' + id + '"]' : '#' + id;
+  }
+  return null;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getNthChild.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getNthChild.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getNthChild = getNthChild;
+
+var _isElement = __webpack_require__(/*! ./isElement */ "./node_modules/unique-selector/lib/isElement.js");
+
+/**
+ * Returns the selectors based on the position of the element relative to its siblings
+ * @param  { Object } element
+ * @return { Array }
+ */
+function getNthChild(element) {
+  var counter = 0;
+  var k = void 0;
+  var sibling = void 0;
+  var parentNode = element.parentNode;
+
+
+  if (Boolean(parentNode)) {
+    var childNodes = parentNode.childNodes;
+
+    var len = childNodes.length;
+    for (k = 0; k < len; k++) {
+      sibling = childNodes[k];
+      if ((0, _isElement.isElement)(sibling)) {
+        counter++;
+        if (sibling === element) {
+          return ':nth-child(' + counter + ')';
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getParents.js":
+/*!********************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getParents.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getParents = getParents;
+
+var _isElement = __webpack_require__(/*! ./isElement */ "./node_modules/unique-selector/lib/isElement.js");
+
+/**
+ * Returns all the element and all of its parents
+ * @param { DOM Element }
+ * @return { Array of DOM elements }
+ */
+function getParents(el) {
+  var parents = [];
+  var currentElement = el;
+  while ((0, _isElement.isElement)(currentElement)) {
+    parents.push(currentElement);
+    currentElement = currentElement.parentNode;
+  }
+
+  return parents;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/getTag.js":
+/*!****************************************************!*\
+  !*** ./node_modules/unique-selector/lib/getTag.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getTag = getTag;
+/**
+ * Returns the Tag of the element
+ * @param  { Object } element
+ * @return { String }
+ */
+function getTag(el) {
+  return el.tagName.toLowerCase().replace(/:/g, '\\:');
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/unique-selector/lib/index.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = unique;
+
+var _getID = __webpack_require__(/*! ./getID */ "./node_modules/unique-selector/lib/getID.js");
+
+var _getClasses = __webpack_require__(/*! ./getClasses */ "./node_modules/unique-selector/lib/getClasses.js");
+
+var _getCombinations = __webpack_require__(/*! ./getCombinations */ "./node_modules/unique-selector/lib/getCombinations.js");
+
+var _getAttributes = __webpack_require__(/*! ./getAttributes */ "./node_modules/unique-selector/lib/getAttributes.js");
+
+var _getNthChild = __webpack_require__(/*! ./getNthChild */ "./node_modules/unique-selector/lib/getNthChild.js");
+
+var _getTag = __webpack_require__(/*! ./getTag */ "./node_modules/unique-selector/lib/getTag.js");
+
+var _isUnique = __webpack_require__(/*! ./isUnique */ "./node_modules/unique-selector/lib/isUnique.js");
+
+var _getParents = __webpack_require__(/*! ./getParents */ "./node_modules/unique-selector/lib/getParents.js");
+
+/**
+ * Returns all the selectors of the elmenet
+ * @param  { Object } element
+ * @return { Object }
+ */
+/**
+ * Expose `unique`
+ */
+
+function getAllSelectors(el, selectors, attributesToIgnore) {
+  var funcs = {
+    'Tag': _getTag.getTag,
+    'NthChild': _getNthChild.getNthChild,
+    'Attributes': function Attributes(elem) {
+      return (0, _getAttributes.getAttributes)(elem, attributesToIgnore);
+    },
+    'Class': _getClasses.getClassSelectors,
+    'ID': _getID.getID
+  };
+
+  return selectors.reduce(function (res, next) {
+    res[next] = funcs[next](el);
+    return res;
+  }, {});
+}
+
+/**
+ * Tests uniqueNess of the element inside its parent
+ * @param  { Object } element
+ * @param { String } Selectors
+ * @return { Boolean }
+ */
+function testUniqueness(element, selector) {
+  var parentNode = element.parentNode;
+
+  var elements = parentNode.querySelectorAll(selector);
+  return elements.length === 1 && elements[0] === element;
+}
+
+/**
+ * Tests all selectors for uniqueness and returns the first unique selector.
+ * @param  { Object } element
+ * @param  { Array } selectors
+ * @return { String }
+ */
+function getFirstUnique(element, selectors) {
+  return selectors.find(testUniqueness.bind(null, element));
+}
+
+/**
+ * Checks all the possible selectors of an element to find one unique and return it
+ * @param  { Object } element
+ * @param  { Array } items
+ * @param  { String } tag
+ * @return { String }
+ */
+function getUniqueCombination(element, items, tag) {
+  var combinations = (0, _getCombinations.getCombinations)(items, 3),
+      firstUnique = getFirstUnique(element, combinations);
+
+  if (Boolean(firstUnique)) {
+    return firstUnique;
+  }
+
+  if (Boolean(tag)) {
+    combinations = combinations.map(function (combination) {
+      return tag + combination;
+    });
+    firstUnique = getFirstUnique(element, combinations);
+
+    if (Boolean(firstUnique)) {
+      return firstUnique;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Returns a uniqueSelector based on the passed options
+ * @param  { DOM } element
+ * @param  { Array } options
+ * @return { String }
+ */
+function getUniqueSelector(element, selectorTypes, attributesToIgnore, excludeRegex) {
+  var foundSelector = void 0;
+
+  var elementSelectors = getAllSelectors(element, selectorTypes, attributesToIgnore);
+
+  if (excludeRegex && excludeRegex instanceof RegExp) {
+    elementSelectors.ID = excludeRegex.test(elementSelectors.ID) ? null : elementSelectors.ID;
+    elementSelectors.Class = elementSelectors.Class.filter(function (className) {
+      return !excludeRegex.test(className);
+    });
+  }
+
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = selectorTypes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var selectorType = _step.value;
+      var ID = elementSelectors.ID,
+          Tag = elementSelectors.Tag,
+          Classes = elementSelectors.Class,
+          Attributes = elementSelectors.Attributes,
+          NthChild = elementSelectors.NthChild;
+
+      switch (selectorType) {
+        case 'ID':
+          if (Boolean(ID) && testUniqueness(element, ID)) {
+            return ID;
+          }
+          break;
+
+        case 'Tag':
+          if (Boolean(Tag) && testUniqueness(element, Tag)) {
+            return Tag;
+          }
+          break;
+
+        case 'Class':
+          if (Boolean(Classes) && Classes.length) {
+            foundSelector = getUniqueCombination(element, Classes, Tag);
+            if (foundSelector) {
+              return foundSelector;
+            }
+          }
+          break;
+
+        case 'Attributes':
+          if (Boolean(Attributes) && Attributes.length) {
+            foundSelector = getUniqueCombination(element, Attributes, Tag);
+            if (foundSelector) {
+              return foundSelector;
+            }
+          }
+          break;
+
+        case 'NthChild':
+          if (Boolean(NthChild)) {
+            return NthChild;
+          }
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return '*';
+}
+
+/**
+ * Generate unique CSS selector for given DOM element
+ *
+ * @param {Element} el
+ * @return {String}
+ * @api private
+ */
+
+function unique(el) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _options$selectorType = options.selectorTypes,
+      selectorTypes = _options$selectorType === undefined ? ['ID', 'Class', 'Tag', 'NthChild'] : _options$selectorType,
+      _options$attributesTo = options.attributesToIgnore,
+      attributesToIgnore = _options$attributesTo === undefined ? ['id', 'class', 'length'] : _options$attributesTo,
+      _options$excludeRegex = options.excludeRegex,
+      excludeRegex = _options$excludeRegex === undefined ? null : _options$excludeRegex;
+
+  var allSelectors = [];
+  var parents = (0, _getParents.getParents)(el);
+
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = parents[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var elem = _step2.value;
+
+      var selector = getUniqueSelector(elem, selectorTypes, attributesToIgnore, excludeRegex);
+      if (Boolean(selector)) {
+        allSelectors.push(selector);
+      }
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  var selectors = [];
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = allSelectors[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var it = _step3.value;
+
+      selectors.unshift(it);
+      var _selector = selectors.join(' > ');
+      if ((0, _isUnique.isUnique)(el, _selector)) {
+        return _selector;
+      }
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
+  }
+
+  return null;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/isElement.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/unique-selector/lib/isElement.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.isElement = isElement;
+/**
+ * Determines if the passed el is a DOM element
+ */
+function isElement(el) {
+  var isElem = void 0;
+
+  if ((typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object') {
+    isElem = el instanceof HTMLElement;
+  } else {
+    isElem = !!el && (typeof el === 'undefined' ? 'undefined' : _typeof(el)) === 'object' && el.nodeType === 1 && typeof el.nodeName === 'string';
+  }
+  return isElem;
+}
+
+/***/ }),
+
+/***/ "./node_modules/unique-selector/lib/isUnique.js":
+/*!******************************************************!*\
+  !*** ./node_modules/unique-selector/lib/isUnique.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isUnique = isUnique;
+/**
+ * Checks if the selector is unique
+ * @param  { Object } element
+ * @param  { String } selector
+ * @return { Array }
+ */
+function isUnique(el, selector) {
+  if (!Boolean(selector)) return false;
+  var elems = el.ownerDocument.querySelectorAll(selector);
+  return elems.length === 1 && elems[0] === el;
+}
+
+/***/ }),
+
 /***/ "./node_modules/url/url.js":
 /*!*********************************!*\
   !*** ./node_modules/url/url.js ***!
@@ -55648,6 +56642,7 @@ var render = function() {
                     _c(
                       "Input",
                       {
+                        staticClass: "ignoreArea",
                         attrs: { placeholder: "默认为300毫秒" },
                         model: {
                           value: _vm.delay,
@@ -55660,7 +56655,11 @@ var render = function() {
                       [
                         _c(
                           "span",
-                          { attrs: { slot: "append" }, slot: "append" },
+                          {
+                            staticClass: "ignoreArea",
+                            attrs: { slot: "append" },
+                            slot: "append"
+                          },
                           [_vm._v("ms")]
                         )
                       ]
@@ -55676,6 +56675,7 @@ var render = function() {
                     _c(
                       "Select",
                       {
+                        staticClass: "ignoreArea",
                         staticStyle: { width: "100%" },
                         attrs: { multiple: "" },
                         model: {
@@ -55758,11 +56758,13 @@ var render = function() {
         _c(
           "Modal",
           {
+            staticClass: "ignoreArea",
             attrs: { value: _vm.isShowModal, title: "请填写此次录制id" },
             on: { "on-cancel": _vm.cancel }
           },
           [
             _c("Input", {
+              staticClass: "ignoreArea",
               staticStyle: { width: "300px" },
               attrs: { placeholder: "请填写此次录制id" },
               model: {
@@ -55776,15 +56778,27 @@ var render = function() {
             _vm._v(" "),
             _c(
               "div",
-              { attrs: { slot: "footer" }, slot: "footer" },
+              {
+                staticClass: "ignoreArea",
+                attrs: { slot: "footer" },
+                slot: "footer"
+              },
               [
                 _c(
                   "Button",
-                  { attrs: { type: "primary" }, on: { click: _vm.ok } },
+                  {
+                    staticClass: "ignoreArea",
+                    attrs: { type: "primary" },
+                    on: { click: _vm.ok }
+                  },
                   [_vm._v("确认")]
                 ),
                 _vm._v(" "),
-                _c("Button", { on: { click: _vm.cancel } }, [_vm._v("取消")])
+                _c(
+                  "Button",
+                  { staticClass: "ignoreArea", on: { click: _vm.cancel } },
+                  [_vm._v("取消")]
+                )
               ],
               1
             )
@@ -68495,6 +69509,34 @@ module.exports = socket;
 
 /***/ }),
 
+/***/ "./node_modules/webpack/buildin/amd-define.js":
+/*!***************************************!*\
+  !*** (webpack)/buildin/amd-define.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function() {
+	throw new Error("define cannot be used indirect");
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/amd-options.js":
+/*!****************************************!*\
+  !*** (webpack)/buildin/amd-options.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(this, {}))
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -68918,19 +69960,21 @@ var Play = function () {
 
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = delay || 300;
+        this.delay = delay || 0;
     }
 
     (0, _createClass3.default)(Play, [{
-        key: "run",
+        key: 'run',
         value: function () {
             var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 var paths = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-                var promiseAll, i;
+                var cb = arguments[1];
+                var promiseAll, i, item;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
+                                this.lastTimeStamp = 0;
                                 this.parser(paths);
                                 promiseAll = [];
 
@@ -68940,22 +69984,30 @@ var Play = function () {
 
                                 i = 0;
 
-                            case 4:
+                            case 5:
                                 if (!(i < promiseAll.length)) {
-                                    _context.next = 10;
+                                    _context.next = 13;
                                     break;
                                 }
 
-                                _context.next = 7;
+                                _context.next = 8;
                                 return promiseAll[i]();
 
-                            case 7:
-                                i++;
-                                _context.next = 4;
-                                break;
+                            case 8:
+                                item = _context.sent;
+
+                                this.lastTimeStamp = item.timeStamp;
 
                             case 10:
-                            case "end":
+                                i++;
+                                _context.next = 5;
+                                break;
+
+                            case 13:
+                                cb && cb();
+
+                            case 14:
+                            case 'end':
                                 return _context.stop();
                         }
                     }
@@ -68969,50 +70021,66 @@ var Play = function () {
             return run;
         }()
     }, {
-        key: "parser",
+        key: 'parser',
         value: function parser(paths) {
             var _this = this;
 
             this.executeArr = paths.map(function (item) {
                 var event = item.event,
-                    selector = item.selector,
-                    innerText = item.innerText;
+                    selector = item.selector;
 
-                var ele = _this.getEle(selector);
                 var _self = _this;
                 return {
                     execute: function execute() {
-                        return _self[event](selector, innerText, item);
+                        return _self[event](selector, item);
                     }
                 };
             });
         }
     }, {
-        key: "click",
-        value: function click(selector) {
+        key: 'click',
+        value: function click(selector, item) {
             var _this2 = this;
 
             return new _promise2.default(function (resolve) {
                 setTimeout(function () {
+                    console.log('delay', _this2.adaptDelay(item), selector);
                     _this2.getEle(selector).click();
-                    resolve();
-                }, _this2.delay);
+                    resolve(item);
+                }, _this2.adaptDelay(item));
             });
         }
     }, {
-        key: "input",
-        value: function input(selector, text) {
+        key: 'contextmenu',
+        value: function contextmenu(selector, item) {
+            return this.click(selector, item);
+        }
+    }, {
+        key: 'input',
+        value: function input(selector, item) {
             var _this3 = this;
 
             new _promise2.default(function (resolve) {
                 setTimeout(function () {
-                    _this3.getEle(selector).value = text;
-                    resolve();
-                }, _this3.delay);
+                    console.log('delay', _this3.adaptDelay(item));
+                    _this3.getEle(selector).value = item.innerText;
+                    resolve(item);
+                }, _this3.adaptDelay(item));
             });
         }
     }, {
-        key: "getEle",
+        key: 'adaptDelay',
+        value: function adaptDelay(item) {
+            if (this.delay) {
+                return this.delay;
+            }
+            if (this.lastTimeStamp) {
+                return item.timeStamp - this.lastTimeStamp;
+            }
+            return 0;
+        }
+    }, {
+        key: 'getEle',
         value: function getEle(name) {
             return document.body.querySelector(name);
         }
@@ -69214,26 +70282,33 @@ var _isMobile = __webpack_require__(/*! ./isMobile */ "./src/common/source/isMob
 
 var _isMobile2 = _interopRequireDefault(_isMobile);
 
+var _uniqueSelector = __webpack_require__(/*! unique-selector */ "./node_modules/unique-selector/lib/index.js");
+
+var _uniqueSelector2 = _interopRequireDefault(_uniqueSelector);
+
+var _cssSelectorGenerator = __webpack_require__(/*! css-selector-generator */ "./node_modules/css-selector-generator/build/css-selector-generator.js");
+
+var _cssSelectorGenerator2 = _interopRequireDefault(_cssSelectorGenerator);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var sg = new _cssSelectorGenerator2.default();
 /**
  * delegate function, when event is triggled, record it.
  * @param {*} e 
  */
 var genAction = exports.genAction = function genAction(e, opts) {
-    // console.log(Date.now(), e, getSelector(e.srcElement));
     var target = e.target,
         srcElement = e.srcElement,
-        tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '';
-
-    //  actions.push('click::' + getSelector(target) + '::' + (+new Date()));
-
+        tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '',
+        timeStamp = +new Date();
     return {
+        timeStamp: timeStamp,
         url: window.location.href,
         title: target.title,
         id: srcElement.getAttribute('_id_'),
         className: srcElement.getAttribute('_class_'),
-        selector: (0, _util.getSelector)(srcElement),
+        selector: sg.getSelector(srcElement),
         tagName: tagName,
         innerText: target.innerText || target.value,
         event: e.type,
@@ -69320,7 +70395,7 @@ var screenshot = {
 };
 
 exports.default = function (recordAction) {
-    ['click', 'dbclick'].forEach(function (event) {
+    ['click', 'dbclick', 'contextmenu'].forEach(function (event) {
         document.addEventListener(event, function (e) {
             recordAction((0, _helpers.genAction)(e, (0, _extends3.default)({}, screenshot)));
         }, true);

@@ -2,9 +2,10 @@ class Play{
     constructor(delay){
         this.currentEle = null;
         this.executeArr = [];
-        this.delay = delay || 300;
+        this.delay = delay || 0;
     }
-    async run(paths = []) {
+    async run(paths = [], cb) {
+        this.lastTimeStamp = 0;
         this.parser(paths);
         let promiseAll = [];
         this.executeArr.forEach((item) => {
@@ -12,36 +13,51 @@ class Play{
         });
         
         for (let i = 0; i < promiseAll.length; i++) {
-            await promiseAll[i]();
+            let item = await promiseAll[i]();
+            this.lastTimeStamp = item.timeStamp
         }
+        cb && cb();
     }
     parser(paths) {
         this.executeArr = paths.map(item => {
-            let {event, selector, innerText} = item;
-            let ele = this.getEle(selector);
+            let {event, selector} = item;
             let _self = this;
             return {
                 execute() {
-                    return _self[event](selector, innerText, item);
+                    return _self[event](selector, item);
                 }
             }
         });
     }
-    click(selector) {
+    click(selector, item) {
         return new Promise((resolve) => {
             setTimeout(() => {
+                console.log('delay',this.adaptDelay(item), selector)
                 this.getEle(selector).click();
-                resolve();
-            }, this.delay)
+                resolve(item);
+            }, this.adaptDelay(item))
         })
     }
-    input(selector, text) {
+    contextmenu(selector, item) {
+        return this.click(selector, item);
+    }
+    input(selector, item) {
         new Promise((resolve) => {
             setTimeout(() => {
-                this.getEle(selector).value = text;
-                resolve();
-            }, this.delay)
+                console.log('delay',this.adaptDelay(item))
+                this.getEle(selector).value = item.innerText;
+                resolve(item);
+            }, this.adaptDelay(item))
         })
+    }
+    adaptDelay(item) {
+        if (this.delay) {
+            return this.delay;
+        }
+        if (this.lastTimeStamp) {
+            return item.timeStamp - this.lastTimeStamp;
+        }
+        return 0;
     }
     getEle(name) {
         return document.body.querySelector(name);

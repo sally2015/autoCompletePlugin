@@ -11,7 +11,7 @@ let screenshot = {
 };
 
 export default (recordAction) => {
-    ['click', 'dbclick'].forEach((event) => {
+    ['click', 'dbclick', 'contextmenu'].forEach((event) => {
         document.addEventListener(event, (e)=> {
             recordAction(genAction(e, { ...screenshot }));
         }, true);

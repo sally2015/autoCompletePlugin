@@ -5,25 +5,25 @@ import {
     Gen
 } from './gen.js'
 import isMobile from './isMobile';
-
+import uniqueSelector from 'unique-selector'
+import SelectorGenerator from 'css-selector-generator'
+const sg = new SelectorGenerator();
 /**
  * delegate function, when event is triggled, record it.
  * @param {*} e 
  */
 export const genAction = function (e, opts) {
-    // console.log(Date.now(), e, getSelector(e.srcElement));
     var target = e.target,
         srcElement = e.srcElement,
-        tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '';
-
-    //  actions.push('click::' + getSelector(target) + '::' + (+new Date()));
-
+        tagName = srcElement.tagName && srcElement.tagName.toLowerCase() || '',
+        timeStamp = +new Date();
     return {
+        timeStamp,
         url: window.location.href,
         title: target.title,
         id: srcElement.getAttribute('_id_'),
         className: srcElement.getAttribute('_class_'),
-        selector: getSelector(srcElement),
+        selector: sg.getSelector(srcElement),
         tagName,
         innerText: target.innerText || target.value,
         event: e.type,

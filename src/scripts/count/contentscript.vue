@@ -14,16 +14,15 @@
         <Row class="mb-20">
             <Form label-position="top">
                 <FormItem label="延迟时间:">
-                    <Input v-model="delay" placeholder="默认为300毫秒">
-                        <span slot="append">ms</span>
+                    <Input class="ignoreArea" v-model="delay" placeholder="默认为300毫秒">
+                        <span class="ignoreArea" slot="append">ms</span>
                     </Input>
                 </FormItem>
                 <FormItem label="执行id:">
-                    <Select v-model="selectedArr" style="width:100%" multiple>
+                    <Select class="ignoreArea" v-model="selectedArr" style="width:100%" multiple>
                         <Option v-for="(item, index) in keys" :value="item" :key="index">{{item}}</Option>
                     </Select>
                 </FormItem>
-                
             </Form>
         </Row>
         <Row class="mb-20">
@@ -35,13 +34,14 @@
             </Col>
         </Row>
         <Modal
+            class="ignoreArea"
             :value="isShowModal"
             @on-cancel="cancel"
             title="请填写此次录制id">
-            <Input v-model="stroageName" placeholder="请填写此次录制id" style="width: 300px" />
-            <div slot="footer">
-                <Button type="primary" @click="ok">确认</Button>
-                <Button @click="cancel">取消</Button>
+            <Input class="ignoreArea" v-model="stroageName" placeholder="请填写此次录制id" style="width: 300px" />
+            <div class="ignoreArea" slot="footer">
+                <Button class="ignoreArea" type="primary" @click="ok">确认</Button>
+                <Button class="ignoreArea" @click="cancel">取消</Button>
             </div>
         </Modal>
     </div>
@@ -58,7 +58,7 @@
   export default {
     data() {
       return {
-        delay: 300,
+        delay: 0,
         actionPaths: [],
         list: [],
         keys: [],
@@ -112,7 +112,9 @@
             this.selectedArr.forEach(selected => {
                 paths = paths.concat(storage.get(selected));
             })
-            this.executor.run(paths);
+            this.executor.run(paths, () => {
+                this.$Message.success('执行成功')
+            });
         },
         toggleLayout() {
             this.layoutShow = !this.layoutShow
@@ -120,7 +122,7 @@
     },
     mounted() {
         this.query();
-        this.executor = new Play(this.Play);
+        this.executor = new Play();
         initRecord((content) => {
             if(this.isRecord && (content.selector.indexOf('ignoreArea') === -1)) {
                 this.actionPaths.push(content);
